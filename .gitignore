@@ -105,3 +105,4 @@ venv.bak/
 
 # VSCode local history feature
 .history
+**/junit.xml
