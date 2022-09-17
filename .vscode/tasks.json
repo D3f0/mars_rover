@@ -1,0 +1,22 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run IPython 🐍🐚im",
+            "type": "shell",
+            "command": "poetry run ipython"
+        },
+        {
+            "label": "Show poetry interpretr path",
+            "type": "shell",
+            "command": "poetry run which python"
+        },
+        {
+            "label": "🎗️ Pre Commit ",
+            "type": "shell",
+            "command": "poetry run pre-commit",
+        }
+    ]
+}
