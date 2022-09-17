@@ -36,3 +36,8 @@ clean:
 # Display pytest available fixtures
 fixtures:
 	poetry run python -m pytest --fixtures
+
+.PHONY: run
+# Run without installation (PATH augmentation)
+run:
+	PYTHONPATH=$(PWD)/src/ python -m mars_rover
