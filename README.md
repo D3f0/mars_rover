@@ -45,3 +45,10 @@ Here is the expected output:
 1 3 N
 5 1 E
 ```
+
+## Proposed Solution
+
+* Python 3.8+
+* Pytest 
+* Coverage
+
