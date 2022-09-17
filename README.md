@@ -49,6 +49,59 @@ Here is the expected output:
 ## Proposed Solution
 
 * Python 3.8+
-* Pytest 
-* Coverage
+* Optional Dependencies (for Development and Testing)
+  * Pytest 
+  * Coverage
+  * IPython
 
+## How to run it
+
+The project can be run with Python 3.8 and above. It doesn't require any external library.
+Running the tests and packing it as a Python wheel require [poetry](https://python-poetry.org).
+
+### Command Line Intraface
+
+### Python interface
+
+*Note that this approach requires some interactive shell like IPython*
+
+Install the Python wheel, and run it from the terminal as follows:
+
+```python
+from mars_rover.entities import Plateau, Rover
+
+p = Plateau(5, 5)
+r = Rover(pos_x=0, pos_y=0, heading="N")
+r.simulate("LLMM")
+print(r)
+
+```
+### Installing the wheel 
+
+Python wheels are the newest standard for Python distribution. Although this 
+project is not published in Python official package idnex PyPI, the CI pipeline
+produces wheels as artifacts. To grab the latest build
+
+1. Go to Github Actions for the project [here](here)
+2. Locate the zip compressed wheel at the bottom of the page.
+    ![img](./docs/img/download_artifact.png)
+3. Download the file and unzip it.
+4. Install it with `python -m pip install path/to/`
+
+### Adding the repo to your `sys.path`
+
+This method is not recommended, but it's possible to add the folder contents
+into the Python path.
+
+```python
+
+import sys
+sys.path.append('path/to/mars_rover')
+from mars_rover.cli import main
+main()
+```
+
+### Using Github CodeSpaces
+
+1. Locate Open Code Spaces in Github web UI
+    ![Code Spaces](./docs/img/open_codespaces.png)
