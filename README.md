@@ -48,6 +48,8 @@ Here is the expected output:
 
 ## Proposed Solution
 
+If the program find a rover out of bounds, it will abort.
+
 * Python 3.8+
   * `argparse` CLI option parsing
   * `re` regular expressions
@@ -181,8 +183,8 @@ the shorthand `sys.exit()` is used to inform the user what went wrong.
 
 
 ## Contributing to the Project
-### Using Github CodeSpaces
 
+### Using Github CodeSpaces
 
 1. Locate Open Code Spaces in Github web UI
     ![Code Spaces](./docs/img/open_codespaces.png)
