@@ -21,5 +21,5 @@ jobs:
       - name: Build and publish a Docker image
         uses: macbre/push-to-ghcr@master
         with:
-          image_name: ghcr.io/d3f0/mars_rover:latest
+          image_name: d3f0/mars_rover:latest
           github_token: ${{ secrets.GITHUB_TOKEN }}
