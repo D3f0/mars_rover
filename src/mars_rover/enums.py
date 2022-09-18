@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Type definitions for the project
 """
@@ -22,12 +23,12 @@ class Rotation(Enum):
         return retval
 
 
-class CardinalDireaction(str, Enum):
+class CardinalDirection(str, Enum):
     """
-    Represents a cardinal direction, this enum allows to have more meaningful 
+    Represents a cardinal direction, this enum allows to have more meaningful
     comparision in the code than strings.
     """
-    
+
     NORTH = "N"
     EAST = "E"
     SOUTH = "S"
@@ -38,8 +39,8 @@ class CardinalDireaction(str, Enum):
     def value_of(cls, value):
         """
         Convert a letter into the appropriate enum value
-        
-        This function could be abstracted if we remove the LRU cache, but will be 
+
+        This function could be abstracted if we remove the LRU cache, but will be
         repeated to have a simpler context.
         """
         by_value = {value.value: value for _, value in cls.__members__.items()}

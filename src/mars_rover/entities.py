@@ -7,12 +7,29 @@ from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict
 
-from .enums import CardinalDireaction, Rotation
+from .enums import CardinalDirection, Rotation
 from .utils import pre_compute_movement_table
 
 LOGGER = getLogger(__name__)
 
-MOVEMENT_TABLE = pre_compute_movement_table(list(CardinalDireaction))
+MOVEMENT_TABLE = pre_compute_movement_table(list(CardinalDirection))
+
+
+@dataclass
+class Point:
+    x: int
+    y: int
+
+    def move(self, direction: CardinalDirection) -> None:
+        """Moves the point towards the desired direction updating the coordiantes"""
+        if direction == CardinalDirection.EAST:
+            self.x += 1
+        elif direction == CardinalDirection.WEST:
+            self.x -= 1
+        elif direction == CardinalDirection.NORTH:
+            self.y += 1
+        elif direction == CardinalDirection.SOUTH:
+            self.y -= 1
 
 
 @dataclass
@@ -26,11 +43,11 @@ class Plateau:
 
     LINE_FORMAT = re.compile(
         r"""
-        \s*                     # Handle spacing, if any at the begining of the line
+        \s*                     # Handle spacing, if any at the beginning of the line
         (?P<top_most>\d+)
         \s+                     # separation between the coordinates
         (?P<right_most>\d+)
-        \s*                     # Any discardable spacing till the end of line
+        \s*                     # Any disposable spacing till the end of line
         """,
         re.VERBOSE,
     )
@@ -62,24 +79,35 @@ class Plateau:
         LOGGER.debug("Created plateau instance %s", instance)
         return instance
 
+    def __contains__(self, point: Point) -> bool:
+        if 0 <= point.x <= self.right_most and 0 <= point.y <= self.top_most:
+            return True
+        return False
+
 
 @dataclass
 class Rover:
     """Represents a rover"""
 
-    pos_x: int
-    pos_y: int
-    facing: CardinalDireaction
+    position: Point
+    facing: CardinalDirection
 
     def __post_init__(self):
-        if self.pos_x < 0:
-            raise ValueError("Rover x position can't be lower than 0")
-        if self.pos_y < 0:
-            raise ValueError("Rover y position can't be lower than 0")
+        if isinstance(self.position, tuple):
+            # Initialized with a couple of integers
+            if len(self.position) == 2:
+                self.position = Point(*self.position)
+        elif not isinstance(self.position, Point):
+            raise ValueError("The rover position must be a Point or a 2 integers tuple")
+        if self.position.x < 0:
+            raise ValueError("x coordinate can't be below 0")
+        if self.position.y < 0:
+            raise ValueError("y coordinate can't be below 0")
+
         if isinstance(self.facing, str):
             facing = self.facing.upper()
-            self.facing = CardinalDireaction.value_of(facing)
-        elif not isinstance(self.facing, CardinalDireaction):
+            self.facing = CardinalDirection.value_of(facing)
+        elif not isinstance(self.facing, CardinalDirection):
             raise ValueError(f"Cardinal direction {self.facing} is invalid.")
 
     LINE_FORMAT = re.compile(
@@ -123,33 +151,17 @@ class Rover:
                     f"pos_y couldn't be processed as an integer, pos_y={groupdict['pos_y']}"
                 ) from excp
 
-            direction = CardinalDireaction.value_of(groupdict["direction"])
-
-            return cls(pos_x=pos_x, pos_y=pos_y, facing=direction)
+            direction = CardinalDirection.value_of(groupdict["direction"])
+            point = Point(pos_x, pos_y)
+            return cls(position=point, facing=direction)
 
     def simulate(self, operations: str, plateau: Plateau) -> None:
         for op in operations:
             LOGGER.info(f"Processing operation {op}")
             if op == "M":
-                self.move()
-                if self.pos_x > plateau.right_most:
-                    raise ValueError(
-                        f"rover exceeded the simulation plateau x coordinate: {self.pos_x}"
-                    )
-                elif self.pos_x < 0:
-                    raise ValueError(
-                        f"rover exceeded the simulation plateau x coordinate: {self.pos_x}"
-                    )
-
-                if self.pos_y > plateau.top_most:
-                    raise ValueError(
-                        f"rover exceeded the simulation plateau y coordinate: {self.pos_y}"
-                    )
-                elif self.pos_y < 0:
-                    raise ValueError(
-                        f"rover exceeded the simulation plateau y coordinate: {self.pos_y}"
-                    )
-
+                self.position.move(self.facing)
+                if self.position not in plateau:
+                    raise ValueError(f"Rover got outside of the {plateau}, {self}")
             elif op in {"R", "L"}:
                 self.rotate(Rotation.value_of(op))
             else:
@@ -159,17 +171,6 @@ class Rover:
         """Rotates the rover in one direction."""
         self.facing = MOVEMENT_TABLE[self.facing][direction]
 
-    def move(self) -> None:
-        """Move rover towards the facing direction."""
-        if self.facing == CardinalDireaction.EAST:
-            self.pos_x += 1
-        elif self.facing == CardinalDireaction.WEST:
-            self.pos_x -= 1
-        elif self.facing == CardinalDireaction.NORTH:
-            self.pos_y += 1
-        elif self.facing == CardinalDireaction.SOUTH:
-            self.pos_y -= 1
-
     def __str__(self) -> str:
         """String representation shwoing the coordinates and facing direction"""
-        return f"{self.pos_x} {self.pos_y} {self.facing}"
+        return f"{self.position.x} {self.position.y} {self.facing}"

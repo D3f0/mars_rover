@@ -1,13 +1,15 @@
+# -*- coding: utf-8 -*-
 """
 Utility funcitons
 """
-from .enums import CardinalDireaction, Rotation
 from typing import Dict, List
+
+from .enums import CardinalDirection, Rotation
 
 
 def pre_compute_movement_table(
-    facings: List[CardinalDireaction],
-) -> Dict[CardinalDireaction, Dict[Rotation, CardinalDireaction]]:
+    facings: List[CardinalDirection],
+) -> Dict[CardinalDirection, Dict[Rotation, CardinalDirection]]:
     """Create a movement table.
 
     A movement table will hold a direction and for each rotation, the
@@ -15,7 +17,7 @@ def pre_compute_movement_table(
     """
     # Note: This could use typing extension, but since we chose Python 3.8
     #       we're going to use basic type hints.
-    table: Dict[CardinalDireaction, Dict[Rotation, CardinalDireaction]] = {}
+    table: Dict[CardinalDirection, Dict[Rotation, CardinalDirection]] = {}
 
     for i, face in enumerate(facings):
         try:
