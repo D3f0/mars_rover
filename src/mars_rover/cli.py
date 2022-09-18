@@ -41,7 +41,7 @@ class LoggingLevelAction(argparse.Action):
         option_string: Union[str, None] = ...,
     ) -> None:
         """
-        Checks that the log leve value is valid within the
+        Checks that the log level value is valid within the
         LOGGING library
         """
         level_uppercase = values.upper()
@@ -51,9 +51,7 @@ class LoggingLevelAction(argparse.Action):
             setattr(namespace, option_string, level_uppercase)
 
         else:
-            raise argparse.ArgumentError(
-                option_string, f"Can't set logging level to {values}"
-            )
+            raise argparse.ArgumentError(self, f"Can't set logging level to {values}")
 
 
 def main():
@@ -62,9 +60,10 @@ def main():
     Parses the arguments for calls from command line interface
     """
     parser = argparse.ArgumentParser(
-        "Mars Rover",
-        description="This software simulates the movements of a Mars Rover based on L(eft), R(rigth) and"
-        "M(ove forwards) characters. It simulates the rovers sequentially.",
+        "mars_rover",
+        description="This software simulates the movements of a Mars Rover based on L(eft), R(ight) and"
+        "M(ove forward) text characters. It simulates the rovers sequentially. Use Ctrl+D to finalize "
+        "the input.",
     )
     parser.add_argument("-I", "--input-file")
     parser.add_argument(
@@ -93,6 +92,8 @@ def main():
             process_stream(sys.stdin)
         except KeyboardInterrupt:
             sys.exit("Terminated by user request.")
+        except ValueError as error:
+            sys.exit(error)
 
     elif args.input_file:
         LOGGER.info("Reading from input file")

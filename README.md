@@ -49,17 +49,85 @@ Here is the expected output:
 ## Proposed Solution
 
 * Python 3.8+
+  * `argparse` CLI option parsing
+  * `re` regular expressions
+  * `dataclass` less verbose classes
 * Optional Dependencies (for Development and Testing)
-  * Pytest 
+  * Pytest
+
+    Running test.
   * Coverage
+
+    Checking coverage of tests
   * IPython
+
+    Better interactive shell
+  * Pdb++
+
+    Drop in replacement for `pdb`, specially useful when debugging tests `py.test --pdb`
+
+  * Github Actions
+
+    * A Continuous Integration pipeline has been set up
+    to run the tests in Python 3.8, 3.9 and 3.10 [here](https://github.com/D3f0/mars_rover/actions/workflows/pytest.yaml). It also creates [Python wheels](https://realpython.com/python-wheels/) under the artifact tabs.
+    * A separate pipeline builds a Docker image that contains the
+      python program as [entrypoint](https://docs.docker.com/engine/reference/run/#entrypoint-default-command-to-execute-at-runtime)
 
 ## How to run it
 
 The project can be run with Python 3.8 and above. It doesn't require any external library.
 Running the tests and packing it as a Python wheel require [poetry](https://python-poetry.org).
 
-### Command Line Intraface
+### Makefile
+
+This method doesn't require to install anything, just run `make run`. It will run the code
+in interactive mode. Note that given the limitations of passing arguments to `make` the file mode
+is not supported.
+
+### Command Line Interface
+
+Once installed though pip, the script `mars_rover` should be available in your path.
+This program can either run interactively `-i` or passing a file as input `-I`.
+
+The wheel for pip installation is available in Github artifacts. Please note that
+this is not PyPI and requires unzipping the file first, and the download is available
+only for 90 days. Alternatively a Docker image has been published to Github Container
+Registry.
+
+```bash
+# Running the command without arguments shows the usage
+usage: Mars Rover [-h] [-I INPUT_FILE] [-i] [-l LOG_LEVEL]
+
+This software simulates the movements of a Mars Rover based on L(eft), R(ight) andM(ove forward) text characters. It
+simulates the rovers sequentially. Use Ctrl+D to finalize the input.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -I INPUT_FILE, --input-file INPUT_FILE
+  -i, --stdin           Read input from stdin
+  -l LOG_LEVEL, --log-level LOG_LEVEL
+                        Set the logging level
+
+```
+
+#### Interactive mode
+
+*Note that an end of file is expected at the end, use `Ctrl+E` in Unix based OSs to produce it*
+
+```bash
+$ mars_rover -i
+10 10
+5 5 N
+MRMLMMRL
+6 8 N
+
+```
+
+#### Using an input file
+
+```bash
+mars_rover -I src/tests/case_01/input.txt
+```
 
 ### Python interface
 
@@ -71,37 +139,53 @@ Install the Python wheel, and run it from the terminal as follows:
 from mars_rover.entities import Plateau, Rover
 
 p = Plateau(5, 5)
-r = Rover(pos_x=0, pos_y=0, heading="N")
-r.simulate("LLMM")
+r = Rover((1, 1), "N")
+r.simulate("LLMRM", p)
 print(r)
-
 ```
-### Installing the wheel 
 
-Python wheels are the newest standard for Python distribution. Although this 
-project is not published in Python official package idnex PyPI, the CI pipeline
+### Installing the wheel
+
+Python wheels are the newest standard for Python distribution. Although this
+project is not published in Python official package index PyPI, the CI pipeline
 produces wheels as artifacts. To grab the latest build
 
 1. Go to Github Actions for the project [here](here)
 2. Locate the zip compressed wheel at the bottom of the page.
     ![img](./docs/img/download_artifact.png)
 3. Download the file and unzip it.
-4. Install it with `python -m pip install path/to/`
+4. Install it with `python -m pip install path/to/mars_rover-0.1.0-py3-none-any.whl`
 
-### Adding the repo to your `sys.path`
 
-This method is not recommended, but it's possible to add the folder contents
-into the Python path.
 
-```python
+## Running inside Docker
 
-import sys
-sys.path.append('path/to/mars_rover')
-from mars_rover.cli import main
-main()
+If Docker is available in your environment, this repository automatically pushes a docker image to Github Container Registry.
+
+To run the program inside docker `-t` (tty allocation) and `-i` (interactive) flags must be provided.
+
+```bash
+docker run --rm -ti ghcr.io/d3f0/mars_rover:latest -i
 ```
 
+![docker execution](./docs/img/docker_execution.jpg)
+
+## Program Design
+
+The program uses `argparse` to parse command line invocations. It works with streams,
+or file-like objects as input, so there's no interaction.
+
+The input parsing is done with the `re` library for regular expressions. When an occurs
+the shorthand `sys.exit()` is used to inform the user what went wrong.
+
+
+
+## Contributing to the Project
 ### Using Github CodeSpaces
+
 
 1. Locate Open Code Spaces in Github web UI
     ![Code Spaces](./docs/img/open_codespaces.png)
+2. Wait until the VSCode environment is operational
+   and run `poetry install` in the terminal. This will
+   leave the Python package `mars_rover` in editable state, any changes to the scripts will be reflected when running the `mars_rover` script in the path.

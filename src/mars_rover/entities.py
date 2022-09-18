@@ -21,7 +21,7 @@ class Point:
     y: int
 
     def move(self, direction: CardinalDirection) -> None:
-        """Moves the point towards the desired direction updating the coordiantes"""
+        """Moves the point towards the desired direction updating the coordinates"""
         if direction == CardinalDirection.EAST:
             self.x += 1
         elif direction == CardinalDirection.WEST:
@@ -129,7 +129,8 @@ class Rover:
         match = cls.LINE_FORMAT.match(line)
         if not match:
             raise ValueError(
-                "Coudn't understand the rover starting point." f"Input supplied: {line}"
+                "Couldn't understand the rover starting point."
+                f"Input supplied: {line}"
             )
         else:
             groupdict: Dict[str, str] = match.groupdict()
@@ -172,5 +173,5 @@ class Rover:
         self.facing = MOVEMENT_TABLE[self.facing][direction]
 
     def __str__(self) -> str:
-        """String representation shwoing the coordinates and facing direction"""
+        """String representation showing the coordinates and facing direction"""
         return f"{self.position.x} {self.position.y} {self.facing}"
